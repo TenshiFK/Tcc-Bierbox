@@ -1,0 +1,17 @@
+# Dependências
+node_modules
+
+# Ficheiros de Ambiente (NUNCA ENVIAR!)
+.env
+.env*
+
+# Logs de depuração
+npm-debug.log*
+yarn-debug.log*
+
+# Outros
+.DS_Store
+*.pem
+
+# Next.js build
+.next/

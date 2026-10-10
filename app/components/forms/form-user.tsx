@@ -1,0 +1,256 @@
+'use client'
+import Button from "../ui/button";
+import Input from "../ui/input";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/app/context/authContext";
+import { getUserInfo, updateUserInfo } from "@/app/services/user";
+import { toast } from "react-toastify";
+import { IMaskInput } from 'react-imask';
+import { Icon } from "@iconify/react";
+
+export default function UserForm() {
+  const { token, logout } = useAuth();
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [senhaAtual, setSenhaAtual] = useState("");
+  const [novaSenha, setNovaSenha] = useState("");
+  const [mostrarSenhaAtual, setMostrarSenhaAtual] = useState(false);
+  const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
+
+  const [avisoSenhaAtual, setAvisoSenhaAtual] = useState(false);
+  const [avisoNovaSenha, setAvisoNovaSenha] = useState(false);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const fetchProfile = async () => {
+      try {
+        const data = await getUserInfo(token);
+        if (data.success) {
+          setNome(data.user.nome_completo);
+          setEmail(data.user.email);
+          setCpf(data.user.cpf);
+        } else {
+          toast.error("Não foi possível carregar perfil.");
+          if (data.message?.toLowerCase().includes("token")) {
+            logout();
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Erro inesperado ao carregar perfil.");
+      } finally {
+        toast.dismiss();
+      }
+    };
+
+    fetchProfile();
+  }, [token, logout]);
+
+  const handleSenhaAtualChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valor = e.target.value;
+    setSenhaAtual(valor);
+    if (valor.length >= 100 && !avisoSenhaAtual) {
+      toast.info("Você atingiu o limite máximo de 100 caracteres para a senha.");
+      setAvisoSenhaAtual(true);
+    } else if (valor.length < 100 && avisoSenhaAtual) {
+      setAvisoSenhaAtual(false);
+    }
+  };
+
+  const handleNovaSenhaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valor = e.target.value;
+    setNovaSenha(valor);
+    if (valor.length >= 100 && !avisoNovaSenha) {
+      toast.info("Você atingiu o limite máximo de 100 caracteres para a senha.");
+      setAvisoNovaSenha(true);
+    } else if (valor.length < 100 && avisoNovaSenha) {
+      setAvisoNovaSenha(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+
+    if (senhaAtual.trim() !== "" && novaSenha.trim() === "") {
+      toast.warning("Preencha a nova senha para alterar sua senha.");
+      return;
+    }
+
+    if (senhaAtual.trim() === "" && novaSenha.trim() !== "") {
+      toast.warning("Informe sua senha atual para alterar a senha.");
+      return;
+    }
+
+    if (novaSenha.trim() !== "") {
+      const senhaValida = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+={}\[\]|\\:;"'<,>.?/~`-]{8,}$/.test(novaSenha);
+      if (!senhaValida) {
+        toast.warning("A nova senha deve ter ao menos 8 caracteres, incluindo letras e números.");
+        return;
+      }
+    }
+
+    const payload: any = {};
+    if (nome.trim() !== "") payload.nome_completo = nome;
+    if (novaSenha.trim() !== "") {
+      payload.senha_atual = senhaAtual;
+      payload.nova_senha = novaSenha;
+    }
+
+    if (Object.keys(payload).length === 0) {
+      toast.info("Nenhuma alteração para salvar.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const response = await updateUserInfo(token, payload);
+      if (response.success) {
+        toast.success("Perfil atualizado com sucesso!");
+        setNome(response.user.nome_completo);
+        setSenhaAtual("");
+        setNovaSenha("");
+      } else {
+        toast.error("Não foi possível atualizar perfil.");
+        console.error("Erro: ", response.message);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro inesperado ao atualizar perfil.");
+    } finally {
+      setIsLoading(false);
+      toast.dismiss();
+    }
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="w-full flex flex-col lg:justify-between lg:h-full pb-20"
+    >
+      <div className="flex flex-col gap-5 pb-10 xl:pb-20">
+        <div>
+          <div className="pb-1">
+            <label htmlFor="nome" className="font-secondary text-gray-tertiary text-xs">
+              Nome Completo
+            </label>
+          </div>
+          <Input
+            id="nome"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            placeholder="Nome aqui"
+            className="px-5"
+          />
+        </div>
+
+        <div>
+          <div className="pb-1">
+            <label htmlFor="email" className="font-secondary text-gray-tertiary text-xs">
+              E-mail
+            </label>
+          </div>
+          <Input
+            id="email"
+            value={email}
+            readOnly
+            placeholder="Email aqui"
+            className="px-5 bg-gray-50/50 cursor-not-allowed text-gray-tertiary/45"
+          />
+        </div>
+
+        <div>
+          <div className="pb-1">
+            <label htmlFor="cpf" className="font-secondary text-gray-tertiary text-xs">
+              CPF cadastrado
+            </label>
+          </div>
+          <IMaskInput
+            id="cpf"
+            mask="000.000.000-00"
+            type="text"
+            value={cpf}
+            className="text-xs sm:text-sm w-full py-3 
+            rounded-xl border border-gray-tertiary/35
+            px-5 bg-gray-50/50 cursor-not-allowed text-gray-tertiary/45"
+            placeholder="CPF aqui"
+          />
+        </div>
+
+        <div>
+          <div className="pb-1">
+            <label htmlFor="senha" className="font-secondary text-gray-tertiary text-xs">
+              Insira sua senha atual:
+            </label>
+          </div>
+          <div className="relative">
+            <Input
+              id="senha"
+              type={mostrarSenhaAtual ? "text" : "password"}
+              placeholder="Senha atual aqui"
+              value={senhaAtual}
+              onChange={handleSenhaAtualChange}
+              className="pr-10"
+              maxLength={100}
+            />
+            <button
+              type="button"
+              onClick={() => setMostrarSenhaAtual(!mostrarSenhaAtual)}
+              className="absolute inset-y-0 right-3 flex items-center"
+              aria-label={mostrarSenhaAtual ? "Ocultar senha" : "Mostrar senha"}
+            >
+              <Icon icon={mostrarSenhaAtual ? "mdi:eye-off" : "mdi:eye"} className="text-gray-tertiary/75 hover:text-gray-tertiary/55 text-base" />
+            </button>
+          </div>
+        </div>
+
+        <div className="">
+          <div className="pb-1">
+            <label htmlFor="novaSenha" className="font-secondary text-gray-tertiary text-xs">
+              Insira sua nova senha:
+            </label>
+          </div>
+          <div className="relative">
+            <Input
+              id="novaSenha"
+              type={mostrarNovaSenha ? "text" : "password"}
+              value={novaSenha}
+              onChange={handleNovaSenhaChange}
+              placeholder="Sua senha nova aqui"
+              className="px-5"
+              maxLength={100}
+            />
+            <button
+              type="button"
+              onClick={() => setMostrarNovaSenha(!mostrarNovaSenha)}
+              className="absolute inset-y-0 right-3 flex items-center"
+              aria-label={mostrarNovaSenha ? "Ocultar senha" : "Mostrar senha"}
+            >
+              <Icon icon={mostrarNovaSenha ? "mdi:eye-off" : "mdi:eye"} className="text-gray-tertiary/75 hover:text-gray-tertiary/55 text-base" />
+            </button>
+          </div>
+          <p className="font-secondary text-gray-quaternary text-xs pt-2">
+          Crie uma senha com mais de 8 dígitos contendo números e letras.
+        </p>
+        </div>
+      </div>
+
+      <Button 
+        type="submit"
+        variant="quaternary"
+        className="w-full py-3 font-medium text-lg flex items-center justify-center"
+      >
+        {isLoading ? (
+          <span className="mx-2 my-[6px] animate-spin rounded-full border-4 border-beige-primary border-t-transparent size-4"></span>
+        ) : (
+          "Atualizar meus Dados"
+        )}
+      </Button>
+      
+    </form>
+  );
+}
