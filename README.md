@@ -38,7 +38,7 @@ A aplicação reúne uma loja virtual e uma área administrativa. Os usuários p
 - [Node.js](https://nodejs.org/) com [Express 5](https://expressjs.com/)
 - [PostgreSQL](https://www.postgresql.org/) com o pacote `pg`
 - Autenticação baseada em JWT e senhas protegidas com bcrypt
-- Integrações de pagamento com Stripe e Mercado Pago
+- Integrações de pagamento com Stripe
 - Cloudinary para armazenamento de mídia
 - Nodemailer e SendGrid para recursos de e-mail
 
@@ -128,13 +128,9 @@ As credenciais dependem dos recursos habilitados no ambiente, incluindo banco de
 - Configure URLs e chaves de teste em ambientes locais.
 - Para produção, restrinja as origens permitidas pelo CORS e utilize HTTPS.
 
-## 🎓 Contexto acadêmico
-
-Projeto desenvolvido como Trabalho de Conclusão de Curso (TCC) de Engenharia de Software, com foco na criação de uma solução para conectar consumidores a cervejarias artesanais por meio de boxes e assinaturas.
-
 ## 👩‍💻 Autoria
 
-Desenvolvido por [TenshiFK](https://github.com/TenshiFK).
+Desenvolvido por [TenshiFK](https://github.com/TenshiFK) e [biancadpteixeiraa](https://github.com/biancadpteixeiraa).
 
 ---
 
