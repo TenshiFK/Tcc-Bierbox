@@ -1,36 +1,141 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍺 Bierbox
 
-## Getting Started
+**Bierbox** é uma plataforma de assinatura de cervejas artesanais desenvolvida como Trabalho de Conclusão de Curso (TCC) de Engenharia de Software. A proposta é aproximar consumidores de cervejarias artesanais, oferecendo uma experiência de descoberta e compra de cervejas por meio de planos de assinatura.
 
-First, run the development server:
+## 📌 Sobre o projeto
+
+A aplicação reúne uma loja virtual e uma área administrativa. Os usuários podem explorar boxes, escolher um plano, gerenciar o carrinho e os endereços de entrega e seguir o fluxo de checkout. A API separada é responsável pelas regras de negócio e pela integração com serviços de apoio.
+
+## ✨ Funcionalidades
+
+### Para clientes
+- Visualização e consulta dos boxes disponíveis.
+- Fluxo de compra com seleção do plano e quantidade.
+- Carrinho de compras.
+- Cadastro e gerenciamento de endereços de entrega.
+- Cálculo de frete.
+- Fluxo de pagamento integrado.
+- Área do usuário para consultar perfil e assinaturas.
+
+### Administração
+- Área administrativa para gerenciamento da plataforma.
+- Visualização de dados e informações relacionadas às vendas e assinaturas.
+
+> A disponibilidade de cada recurso depende da configuração da aplicação e dos serviços externos utilizados.
+
+## 🧰 Tecnologias
+
+### Frontend
+- [Next.js 15](https://nextjs.org/) e [React 19](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS 3](https://tailwindcss.com/)
+- [Axios](https://axios-http.com/) para requisições HTTP
+- [TanStack Table](https://tanstack.com/table) para tabelas
+- [Embla Carousel](https://www.embla-carousel.com/) para carrosséis
+- [Recharts](https://recharts.org/) para visualização de dados
+
+### Backend
+- [Node.js](https://nodejs.org/) com [Express 5](https://expressjs.com/)
+- [PostgreSQL](https://www.postgresql.org/) com o pacote `pg`
+- Autenticação baseada em JWT e senhas protegidas com bcrypt
+- Integrações de pagamento com Stripe e Mercado Pago
+- Cloudinary para armazenamento de mídia
+- Nodemailer e SendGrid para recursos de e-mail
+
+## 📁 Estrutura do repositório
+
+```text
+Tcc-Bierbox/
+├── app/                 # Aplicação frontend Next.js
+│   ├── (pages)/         # Páginas da aplicação
+│   ├── api/             # Rotas de API do Next.js
+│   ├── components/      # Componentes reutilizáveis
+│   ├── context/         # Contextos React
+│   ├── hooks/           # Hooks personalizados
+│   ├── lib/             # Utilitários
+│   └── services/        # Serviços e chamadas à API
+├── backend/             # API Node.js / Express
+│   ├── config/          # Configurações
+│   ├── controllers/     # Controladores
+│   ├── middleware/      # Middlewares
+│   ├── routes/          # Rotas da API
+│   └── index.js         # Inicialização do servidor
+├── public/              # Arquivos estáticos
+├── package.json         # Dependências e scripts do frontend
+└── README.md
+```
+
+## ⚙️ Pré-requisitos
+
+Antes de começar, instale:
+- [Node.js](https://nodejs.org/) (versão compatível com as dependências do projeto).
+- npm (incluído com o Node.js).
+- Uma instância PostgreSQL configurada para a aplicação.
+
+Para integrações de pagamento, e-mail e armazenamento de imagens, também podem ser necessárias credenciais dos serviços correspondentes.
+
+## 🚀 Como executar
+
+Clone o repositório:
+
+```bash
+git clone https://github.com/TenshiFK/Tcc-Bierbox.git
+cd Tcc-Bierbox
+```
+
+### 1. Configurar o frontend
+
+Na raiz do projeto, instale as dependências:
+
+```bash
+npm install
+```
+
+Crie um arquivo `.env.local` na raiz e configure as variáveis de ambiente exigidas pela aplicação, como a URL da API. Os nomes exatos devem corresponder aos utilizados nos arquivos de configuração e serviços do projeto.
+
+Inicie o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. Configurar o backend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Em outro terminal, instale as dependências da API:
 
-## Learn More
+```bash
+cd backend
+npm install
+```
 
-To learn more about Next.js, take a look at the following resources:
+Configure as variáveis de ambiente em um arquivo `.env` dentro da pasta `backend`. Inclua, conforme necessário, a conexão com o banco de dados (por exemplo, `DATABASE_URL`), a porta e as credenciais dos serviços externos. Não compartilhe esse arquivo nem envie segredos para o Git.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Inicie a API:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm start
+```
 
-## Deploy on Vercel
+Por padrão, o servidor utiliza a porta `4000` quando nenhuma variável `PORT` é definida. Com a API em execução, a rota raiz responde em [http://localhost:4000](http://localhost:4000).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔐 Variáveis de ambiente e segurança
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+As credenciais dependem dos recursos habilitados no ambiente, incluindo banco de dados, autenticação, pagamentos, e-mail e armazenamento de imagens. Consulte os arquivos de configuração e integração do projeto para confirmar os nomes necessários.
+
+- Nunca publique chaves secretas, tokens JWT, senhas ou credenciais de serviços.
+- Configure URLs e chaves de teste em ambientes locais.
+- Para produção, restrinja as origens permitidas pelo CORS e utilize HTTPS.
+
+## 🎓 Contexto acadêmico
+
+Projeto desenvolvido como Trabalho de Conclusão de Curso (TCC) de Engenharia de Software, com foco na criação de uma solução para conectar consumidores a cervejarias artesanais por meio de boxes e assinaturas.
+
+## 👩‍💻 Autoria
+
+Desenvolvido por [TenshiFK](https://github.com/TenshiFK).
+
+---
+
+<p align="center">Feito com 🍺 para valorizar as cervejas artesanais.</p>
